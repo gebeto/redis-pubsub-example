@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	Users:
+
+	<ul id="ul">
+		
+	</ul>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
+	<script>
+		const users = {};
+		const usersList = document.getElementById("ul");
+
+		const updateUser = function (user) {
+			if (!user.element) {
+				user.element = document.createElement("li");
+				usersList.appendChild(user.element);
+			}
+			users[user.id].element.textContent = `${users[user.id].id}: ${users[user.id].name};`;
+		};
+
+		const sock = io("http://localhost:3000");
+
+		sock.on("user:added", (user) => {
+			console.log('MESSAGE ADDED', user);
+			users[user.id] = {...users[user.id], ...user};
+			updateUser(users[user.id]);
+		});
+
+		sock.on("user:updated", (user) => {
+			console.log('MESSAGE UPDATED', user);
+			users[user.id] = {...users[user.id], ...user};
+			updateUser(users[user.id]);
+		});
+	</script>
+</body>
+</html>
